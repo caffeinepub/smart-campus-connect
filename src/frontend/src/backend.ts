@@ -113,6 +113,10 @@ export interface Event {
     timestamp: bigint;
     eventDate: bigint;
 }
+export interface UserProfileEntry {
+    principal: Principal;
+    profile: UserProfile;
+}
 export interface StudyPost {
     id: bigint;
     title: string;
@@ -162,6 +166,9 @@ export interface backendInterface {
     createDoubt(title: string, content: string, subjectTag: string): Promise<void>;
     createEvent(title: string, description: string, eventDate: bigint): Promise<void>;
     createStudyPost(title: string, content: string, subjectTag: string): Promise<void>;
+    deleteDoubt(id: bigint): Promise<void>;
+    deleteStudyPost(id: bigint): Promise<void>;
+    getAllUserProfiles(): Promise<Array<UserProfileEntry>>;
     getAnnouncements(): Promise<Array<Announcement>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
@@ -175,8 +182,10 @@ export interface backendInterface {
     isAdmin(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     likeStudyPost(id: bigint): Promise<void>;
+    registerUser(): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     sendChatMessage(content: string): Promise<void>;
+    updateDoubt(id: bigint, title: string, content: string, subjectTag: string): Promise<void>;
     updateProfile(displayName: string, bio: string): Promise<void>;
 }
 import type { UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
@@ -277,6 +286,48 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.createStudyPost(arg0, arg1, arg2);
+            return result;
+        }
+    }
+    async deleteDoubt(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteDoubt(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteDoubt(arg0);
+            return result;
+        }
+    }
+    async deleteStudyPost(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteStudyPost(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteStudyPost(arg0);
+            return result;
+        }
+    }
+    async getAllUserProfiles(): Promise<Array<UserProfileEntry>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllUserProfiles();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllUserProfiles();
             return result;
         }
     }
@@ -462,6 +513,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async registerUser(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.registerUser();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.registerUser();
+            return result;
+        }
+    }
     async saveCallerUserProfile(arg0: UserProfile): Promise<void> {
         if (this.processError) {
             try {
@@ -487,6 +552,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.sendChatMessage(arg0);
+            return result;
+        }
+    }
+    async updateDoubt(arg0: bigint, arg1: string, arg2: string, arg3: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateDoubt(arg0, arg1, arg2, arg3);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateDoubt(arg0, arg1, arg2, arg3);
             return result;
         }
     }

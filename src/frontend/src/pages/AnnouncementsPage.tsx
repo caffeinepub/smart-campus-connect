@@ -51,10 +51,12 @@ export default function AnnouncementsPage() {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       const displayMsg =
-        msg.includes("Not authorized") || msg.includes("Unauthorized")
-          ? "Only admins can post announcements."
-          : msg.includes("User is not registered")
-            ? "Please log in and wait a moment, then try again."
+        msg.includes("Anonymous") ||
+        msg.includes("not registered") ||
+        msg.includes("Unauthorized")
+          ? "Please wait a moment and try again — your session is being set up."
+          : msg.includes("Not authorized")
+            ? "Only admins can post announcements."
             : msg.includes("Title must be between")
               ? (msg.split("rejected:").pop()?.trim() ??
                 "Title is too short or too long.")

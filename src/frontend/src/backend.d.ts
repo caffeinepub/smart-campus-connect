@@ -31,6 +31,10 @@ export interface Event {
     timestamp: bigint;
     eventDate: bigint;
 }
+export interface UserProfileEntry {
+    principal: Principal;
+    profile: UserProfile;
+}
 export interface StudyPost {
     id: bigint;
     title: string;
@@ -79,6 +83,9 @@ export interface backendInterface {
     createDoubt(title: string, content: string, subjectTag: string): Promise<void>;
     createEvent(title: string, description: string, eventDate: bigint): Promise<void>;
     createStudyPost(title: string, content: string, subjectTag: string): Promise<void>;
+    deleteDoubt(id: bigint): Promise<void>;
+    deleteStudyPost(id: bigint): Promise<void>;
+    getAllUserProfiles(): Promise<Array<UserProfileEntry>>;
     getAnnouncements(): Promise<Array<Announcement>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
@@ -92,7 +99,9 @@ export interface backendInterface {
     isAdmin(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     likeStudyPost(id: bigint): Promise<void>;
+    registerUser(): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     sendChatMessage(content: string): Promise<void>;
+    updateDoubt(id: bigint, title: string, content: string, subjectTag: string): Promise<void>;
     updateProfile(displayName: string, bio: string): Promise<void>;
 }

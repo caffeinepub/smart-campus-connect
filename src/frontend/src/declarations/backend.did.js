@@ -13,17 +13,21 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const UserProfile = IDL.Record({
+  'bio' : IDL.Text,
+  'displayName' : IDL.Text,
+  'role' : IDL.Text,
+});
+export const UserProfileEntry = IDL.Record({
+  'principal' : IDL.Principal,
+  'profile' : UserProfile,
+});
 export const Announcement = IDL.Record({
   'id' : IDL.Nat,
   'title' : IDL.Text,
   'content' : IDL.Text,
   'createdBy' : IDL.Principal,
   'timestamp' : IDL.Int,
-});
-export const UserProfile = IDL.Record({
-  'bio' : IDL.Text,
-  'displayName' : IDL.Text,
-  'role' : IDL.Text,
 });
 export const ChatMessage = IDL.Record({
   'id' : IDL.Nat,
@@ -82,6 +86,9 @@ export const idlService = IDL.Service({
   'createDoubt' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
   'createEvent' : IDL.Func([IDL.Text, IDL.Text, IDL.Int], [], []),
   'createStudyPost' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
+  'deleteDoubt' : IDL.Func([IDL.Nat], [], []),
+  'deleteStudyPost' : IDL.Func([IDL.Nat], [], []),
+  'getAllUserProfiles' : IDL.Func([], [IDL.Vec(UserProfileEntry)], ['query']),
   'getAnnouncements' : IDL.Func([], [IDL.Vec(Announcement)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
@@ -99,8 +106,10 @@ export const idlService = IDL.Service({
   'isAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'likeStudyPost' : IDL.Func([IDL.Nat], [], []),
+  'registerUser' : IDL.Func([], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'sendChatMessage' : IDL.Func([IDL.Text], [], []),
+  'updateDoubt' : IDL.Func([IDL.Nat, IDL.Text, IDL.Text, IDL.Text], [], []),
   'updateProfile' : IDL.Func([IDL.Text, IDL.Text], [], []),
 });
 
@@ -112,17 +121,21 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
+  const UserProfile = IDL.Record({
+    'bio' : IDL.Text,
+    'displayName' : IDL.Text,
+    'role' : IDL.Text,
+  });
+  const UserProfileEntry = IDL.Record({
+    'principal' : IDL.Principal,
+    'profile' : UserProfile,
+  });
   const Announcement = IDL.Record({
     'id' : IDL.Nat,
     'title' : IDL.Text,
     'content' : IDL.Text,
     'createdBy' : IDL.Principal,
     'timestamp' : IDL.Int,
-  });
-  const UserProfile = IDL.Record({
-    'bio' : IDL.Text,
-    'displayName' : IDL.Text,
-    'role' : IDL.Text,
   });
   const ChatMessage = IDL.Record({
     'id' : IDL.Nat,
@@ -181,6 +194,9 @@ export const idlFactory = ({ IDL }) => {
     'createDoubt' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
     'createEvent' : IDL.Func([IDL.Text, IDL.Text, IDL.Int], [], []),
     'createStudyPost' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
+    'deleteDoubt' : IDL.Func([IDL.Nat], [], []),
+    'deleteStudyPost' : IDL.Func([IDL.Nat], [], []),
+    'getAllUserProfiles' : IDL.Func([], [IDL.Vec(UserProfileEntry)], ['query']),
     'getAnnouncements' : IDL.Func([], [IDL.Vec(Announcement)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
@@ -198,8 +214,10 @@ export const idlFactory = ({ IDL }) => {
     'isAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'likeStudyPost' : IDL.Func([IDL.Nat], [], []),
+    'registerUser' : IDL.Func([], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'sendChatMessage' : IDL.Func([IDL.Text], [], []),
+    'updateDoubt' : IDL.Func([IDL.Nat, IDL.Text, IDL.Text, IDL.Text], [], []),
     'updateProfile' : IDL.Func([IDL.Text, IDL.Text], [], []),
   });
 };

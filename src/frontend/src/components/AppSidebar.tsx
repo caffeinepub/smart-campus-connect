@@ -10,6 +10,7 @@ import {
   Menu,
   MessageCircle,
   User,
+  Users,
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -25,9 +26,15 @@ export type Page =
   | "events"
   | "announcements"
   | "chat"
+  | "students"
   | "profile";
 
-const NAV_ITEMS: { id: Page; label: string; icon: React.ReactNode }[] = [
+const NAV_ITEMS: {
+  id: Page;
+  label: string;
+  icon: React.ReactNode;
+  ocid?: string;
+}[] = [
   {
     id: "dashboard",
     label: "Dashboard",
@@ -46,6 +53,12 @@ const NAV_ITEMS: { id: Page; label: string; icon: React.ReactNode }[] = [
     icon: <Bell className="h-4 w-4" />,
   },
   { id: "chat", label: "Chat", icon: <MessageCircle className="h-4 w-4" /> },
+  {
+    id: "students",
+    label: "Students",
+    icon: <Users className="h-4 w-4" />,
+    ocid: "nav.students_link",
+  },
   { id: "profile", label: "Profile", icon: <User className="h-4 w-4" /> },
 ];
 
@@ -97,6 +110,7 @@ export function AppSidebar({ currentPage, onPageChange }: AppSidebarProps) {
               type="button"
               key={item.id}
               onClick={() => handleNav(item.id)}
+              data-ocid={item.ocid}
               className={`
                 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150
                 ${

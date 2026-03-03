@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { BookOpen, Heart, Loader2, Plus, Search } from "lucide-react";
+import { BookOpen, Heart, Loader2, Plus, Search, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -29,8 +29,10 @@ import { SUBJECT_TAGS, SubjectTagBadge } from "../components/SubjectTagBadge";
 import { useInternetIdentity } from "../hooks/useInternetIdentity";
 import {
   useCreateStudyPost,
+  useDeleteStudyPost,
   useGetMyProfile,
   useGetStudyPosts,
+  useIsAdmin,
   useLikeStudyPost,
 } from "../hooks/useQueries";
 import { formatRelativeTime, getInitials } from "../utils/timeUtils";
@@ -40,11 +42,19 @@ function StudyPostCard({
   onLike,
   isLiking,
   currentPrincipal,
+  onDelete,
+  isDeleting,
+  isOwner,
+  isAdminUser,
 }: {
   post: StudyPost;
   onLike: (id: bigint) => void;
   isLiking: boolean;
   currentPrincipal: string | null;
+  onDelete: (id: bigint) => void;
+  isDeleting: boolean;
+  isOwner: boolean;
+  isAdminUser: boolean;
 }) {
   const likeCount = post.likes.length;
   const hasLiked = currentPrincipal
@@ -56,6 +66,7 @@ function StudyPostCard({
       layout
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
     >
       <Card className="campus-card border-border bg-card h-full flex flex-col">
         <CardHeader className="pb-3 flex-shrink-0">
@@ -92,11 +103,28 @@ function StudyPostCard({
               <Heart className={`h-4 w-4 ${hasLiked ? "fill-current" : ""}`} />
               <span>{likeCount}</span>
             </button>
-            {!currentPrincipal && (
-              <span className="text-xs text-muted-foreground">
-                Login to like
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {!currentPrincipal && (
+                <span className="text-xs text-muted-foreground">
+                  Login to like
+                </span>
+              )}
+              {(isOwner || isAdminUser) && (
+                <button
+                  type="button"
+                  onClick={() => onDelete(post.id)}
+                  disabled={isDeleting}
+                  className="flex items-center justify-center w-7 h-7 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Delete post"
+                >
+                  {isDeleting ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-3.5 w-3.5" />
+                  )}
+                </button>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -110,8 +138,10 @@ export default function StudyMaterialsPage() {
 
   const { data: posts, isLoading } = useGetStudyPosts();
   const { data: profile } = useGetMyProfile();
+  const { data: isAdminData } = useIsAdmin();
   const createPost = useCreateStudyPost();
   const likePost = useLikeStudyPost();
+  const deletePost = useDeleteStudyPost();
 
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -145,14 +175,17 @@ export default function StudyMaterialsPage() {
       setForm({ title: "", content: "", subjectTag: "" });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      const displayMsg = msg.includes("User profile not found")
-        ? "Please set up your profile first before posting."
-        : msg.includes("User is not registered")
-          ? "Please log in and wait a moment, then try again."
-          : msg.includes("Title must be between")
-            ? (msg.split("rejected:").pop()?.trim() ??
-              "Title is too short or too long.")
-            : "Failed to create post. Please try again.";
+      const displayMsg =
+        msg.includes("Anonymous") ||
+        msg.includes("not registered") ||
+        msg.includes("Unauthorized")
+          ? "Please wait a moment and try again — your session is being set up."
+          : msg.includes("User profile not found")
+            ? "Please set up your profile first before posting."
+            : msg.includes("Title must be between")
+              ? (msg.split("rejected:").pop()?.trim() ??
+                "Title is too short or too long.")
+              : "Failed to create post. Please try again.";
       toast.error(displayMsg);
     }
   };
@@ -162,9 +195,27 @@ export default function StudyMaterialsPage() {
       await likePost.mutateAsync(id);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      const displayMsg = msg.includes("User is not registered")
-        ? "Please log in and wait a moment, then try again."
-        : "Failed to like post. Please try again.";
+      const displayMsg =
+        msg.includes("Anonymous") ||
+        msg.includes("not registered") ||
+        msg.includes("Unauthorized")
+          ? "Please wait a moment and try again — your session is being set up."
+          : "Failed to like post. Please try again.";
+      toast.error(displayMsg);
+    }
+  };
+
+  const handleDelete = async (id: bigint) => {
+    try {
+      await deletePost.mutateAsync(id);
+      toast.success("Post deleted");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const displayMsg = msg.includes("Not authorized")
+        ? "You are not authorized to delete this post."
+        : msg.includes("Post not found")
+          ? "Post not found."
+          : "Failed to delete post. Please try again.";
       toast.error(displayMsg);
     }
   };
@@ -272,6 +323,10 @@ export default function StudyMaterialsPage() {
                 onLike={handleLike}
                 isLiking={likePost.isPending}
                 currentPrincipal={currentPrincipal}
+                onDelete={handleDelete}
+                isDeleting={deletePost.isPending}
+                isOwner={post.author.toString() === currentPrincipal}
+                isAdminUser={!!isAdminData}
               />
             ))}
           </AnimatePresence>

@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { AppSidebar, type Page } from "./components/AppSidebar";
+import { useAutoRegister } from "./hooks/useAutoRegister";
 import { useInternetIdentity } from "./hooks/useInternetIdentity";
 import AnnouncementsPage from "./pages/AnnouncementsPage";
 import ChatPage from "./pages/ChatPage";
@@ -11,6 +12,7 @@ import DoubtsPage from "./pages/DoubtsPage";
 import EventsPage from "./pages/EventsPage";
 import LandingPage from "./pages/LandingPage";
 import ProfilePage from "./pages/ProfilePage";
+import StudentsPage from "./pages/StudentsPage";
 import StudyMaterialsPage from "./pages/StudyMaterialsPage";
 
 function PageContent({ page }: { page: Page }) {
@@ -27,6 +29,8 @@ function PageContent({ page }: { page: Page }) {
       return <AnnouncementsPage />;
     case "chat":
       return <ChatPage />;
+    case "students":
+      return <StudentsPage />;
     case "profile":
       return <ProfilePage />;
     default:
@@ -38,6 +42,10 @@ export default function App() {
   const { identity, isInitializing } = useInternetIdentity();
   const [currentPage, setCurrentPage] = useState<Page>("dashboard");
 
+  // Auto-register the user in the background — does NOT block rendering
+  useAutoRegister();
+
+  // Only show loading while the Internet Identity SDK is initializing
   if (isInitializing) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -46,7 +54,7 @@ export default function App() {
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
           <p className="text-muted-foreground text-sm">
-            Initializing Smart Campus Connect...
+            Loading Smart Campus Connect...
           </p>
         </div>
         <Toaster />

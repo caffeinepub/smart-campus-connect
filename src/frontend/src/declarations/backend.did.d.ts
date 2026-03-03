@@ -70,6 +70,10 @@ export interface UserProfile {
   'displayName' : string,
   'role' : string,
 }
+export interface UserProfileEntry {
+  'principal' : Principal,
+  'profile' : UserProfile,
+}
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
@@ -81,6 +85,9 @@ export interface _SERVICE {
   'createDoubt' : ActorMethod<[string, string, string], undefined>,
   'createEvent' : ActorMethod<[string, string, bigint], undefined>,
   'createStudyPost' : ActorMethod<[string, string, string], undefined>,
+  'deleteDoubt' : ActorMethod<[bigint], undefined>,
+  'deleteStudyPost' : ActorMethod<[bigint], undefined>,
+  'getAllUserProfiles' : ActorMethod<[], Array<UserProfileEntry>>,
   'getAnnouncements' : ActorMethod<[], Array<Announcement>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
@@ -94,8 +101,10 @@ export interface _SERVICE {
   'isAdmin' : ActorMethod<[], boolean>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'likeStudyPost' : ActorMethod<[bigint], undefined>,
+  'registerUser' : ActorMethod<[], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'sendChatMessage' : ActorMethod<[string], undefined>,
+  'updateDoubt' : ActorMethod<[bigint, string, string, string], undefined>,
   'updateProfile' : ActorMethod<[string, string], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
