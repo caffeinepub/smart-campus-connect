@@ -93,10 +93,10 @@ function GroupChat() {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <ScrollArea className="flex-1 p-4">
+    <div className="flex flex-col" style={{ height: "100%" }}>
+      <div className="flex-1 overflow-y-auto p-4 min-h-0">
         {isLoading ? (
-          <div className="flex items-center justify-center h-full py-16">
+          <div className="flex items-center justify-center py-16">
             <div className="flex flex-col items-center gap-2">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
               <p className="text-muted-foreground text-sm">
@@ -106,7 +106,7 @@ function GroupChat() {
           </div>
         ) : sortedMessages.length === 0 ? (
           <div
-            className="flex flex-col items-center justify-center h-full py-16 gap-3 text-center"
+            className="flex flex-col items-center justify-center py-16 gap-3 text-center"
             data-ocid="chat.empty_state"
           >
             <MessageCircle className="h-10 w-10 text-muted-foreground/40" />
@@ -181,9 +181,9 @@ function GroupChat() {
             <div ref={bottomRef} />
           </div>
         )}
-      </ScrollArea>
+      </div>
 
-      <div className="flex-shrink-0 border-t border-border p-3">
+      <div className="flex-shrink-0 border-t border-border p-3 bg-card">
         {identity ? (
           <form
             onSubmit={(e) => {
@@ -205,7 +205,7 @@ function GroupChat() {
               type="submit"
               disabled={sendMessage.isPending || !text.trim()}
               size="icon"
-              className="bg-primary text-primary-foreground flex-shrink-0"
+              className="bg-primary text-primary-foreground flex-shrink-0 cursor-pointer"
             >
               {sendMessage.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -257,7 +257,7 @@ function DMConversation({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col" style={{ height: "100%" }}>
       <div className="flex-shrink-0 p-3 border-b border-border flex items-center gap-3">
         <Avatar className="h-8 w-8">
           <AvatarFallback
@@ -274,13 +274,13 @@ function DMConversation({
         </div>
       </div>
 
-      <ScrollArea className="flex-1 p-4">
+      <div className="flex-1 overflow-y-auto p-4 min-h-0">
         {isLoading ? (
-          <div className="flex items-center justify-center h-full py-16">
+          <div className="flex items-center justify-center py-16">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
           </div>
         ) : dms.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full py-16 gap-3 text-center">
+          <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
             <MessageSquare className="h-10 w-10 text-muted-foreground/40" />
             <p className="text-muted-foreground text-sm">
               No messages yet. Say hello to {partnerName}!
@@ -314,9 +314,9 @@ function DMConversation({
             <div ref={bottomRef} />
           </div>
         )}
-      </ScrollArea>
+      </div>
 
-      <div className="flex-shrink-0 border-t border-border p-3">
+      <div className="flex-shrink-0 border-t border-border p-3 bg-card">
         {identity ? (
           <form
             onSubmit={(e) => {
@@ -326,7 +326,7 @@ function DMConversation({
             className="flex gap-2"
           >
             <Input
-              data-ocid="chat.dm_send_button"
+              data-ocid="chat.dm_message_input"
               placeholder={`Message ${partnerName}...`}
               value={text}
               onChange={(e) => setText(e.target.value)}
@@ -334,10 +334,11 @@ function DMConversation({
               autoComplete="off"
             />
             <Button
+              data-ocid="chat.dm_send_button"
               type="submit"
               disabled={sendDm.isPending || !text.trim()}
               size="icon"
-              className="bg-primary text-primary-foreground flex-shrink-0"
+              className="bg-primary text-primary-foreground flex-shrink-0 cursor-pointer"
             >
               {sendDm.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -495,7 +496,7 @@ function DirectMessages() {
   }
 
   return (
-    <div className="flex h-full">
+    <div className="flex" style={{ height: "100%" }}>
       {/* Left panel: conversation list */}
       <div className="w-64 border-r border-border flex flex-col flex-shrink-0">
         <div className="p-3 border-b border-border flex items-center justify-between">
@@ -505,13 +506,13 @@ function DirectMessages() {
             variant="ghost"
             size="icon"
             onClick={() => setNewMessageOpen(true)}
-            className="h-7 w-7 text-muted-foreground hover:text-primary"
+            className="h-7 w-7 text-muted-foreground hover:text-primary cursor-pointer"
             title="New message"
           >
             <Plus className="h-4 w-4" />
           </Button>
         </div>
-        <ScrollArea className="flex-1">
+        <div className="flex-1 overflow-y-auto min-h-0">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-5 w-5 animate-spin text-primary" />
@@ -560,7 +561,7 @@ function DirectMessages() {
               ))}
             </div>
           )}
-        </ScrollArea>
+        </div>
       </div>
 
       {/* Right panel: conversation */}
@@ -602,9 +603,9 @@ function DirectMessages() {
 
 export default function ChatPage() {
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] lg:h-[calc(100vh-4rem)]">
+    <div className="flex flex-col" style={{ height: "calc(100vh - 7rem)" }}>
       {/* Header */}
-      <div className="flex-shrink-0 mb-4">
+      <div className="flex-shrink-0 mb-3">
         <h1 className="font-heading text-2xl font-bold text-foreground flex items-center gap-2">
           <MessageCircle className="h-6 w-6 text-primary" />
           Student Chat
@@ -619,7 +620,10 @@ export default function ChatPage() {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="group" className="flex-1 flex flex-col min-h-0">
+      <Tabs
+        defaultValue="group"
+        className="flex-1 flex flex-col min-h-0 gap-0 overflow-hidden"
+      >
         <TabsList className="flex-shrink-0 grid w-full grid-cols-2 bg-secondary mb-3 max-w-xs">
           <TabsTrigger
             data-ocid="chat.group_tab"
@@ -639,13 +643,16 @@ export default function ChatPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="group" className="flex-1 min-h-0 mt-0">
+        <TabsContent
+          value="group"
+          className="flex-1 min-h-0 mt-0 overflow-hidden"
+        >
           <div className="h-full rounded-xl border border-border bg-card overflow-hidden flex flex-col">
             <GroupChat />
           </div>
         </TabsContent>
 
-        <TabsContent value="dm" className="flex-1 min-h-0 mt-0">
+        <TabsContent value="dm" className="flex-1 min-h-0 mt-0 overflow-hidden">
           <div className="h-full rounded-xl border border-border bg-card overflow-hidden flex flex-col">
             <DirectMessages />
           </div>

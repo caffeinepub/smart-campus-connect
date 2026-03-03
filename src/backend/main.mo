@@ -142,22 +142,23 @@ actor {
       Runtime.trap("Anonymous users cannot register");
     };
 
-    // Check if user is already registered
-    let currentRole = AccessControl.getUserRole(accessControlState, caller);
-    if (currentRole != #guest) {
-      return;
+    // Skip if already registered in access control
+    switch (accessControlState.userRoles.get(caller)) {
+      case (?_) { return };
+      case (null) {};
     };
-
-    // Determine role: first user is admin, others are students
-    let role : Text = if (userProfiles.size() == 0) { "admin" } else { "student" };
-
-    // Create placeholder profile
-    let placeholderProfile : UserProfile = {
-      displayName = "";
-      bio = "";
-      role;
+    // First registered user becomes admin
+    let isFirstUser = not accessControlState.adminAssigned;
+    let acRole : AccessControl.UserRole = if (isFirstUser) { #admin } else { #user };
+    let roleText : Text = if (isFirstUser) { "admin" } else { "student" };
+    accessControlState.userRoles.add(caller, acRole);
+    if (isFirstUser) { accessControlState.adminAssigned := true };
+    switch (userProfiles.get(caller)) {
+      case (null) {
+        userProfiles.add(caller, { displayName = ""; bio = ""; role = roleText });
+      };
+      case (?_) {};
     };
-    userProfiles.add(caller, placeholderProfile);
   };
 
   // Profile Functions
